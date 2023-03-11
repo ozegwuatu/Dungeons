@@ -63,6 +63,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DungeonsPlayer|Enhanced Input|Input Actions|Movement")
 		TObjectPtr<UInputAction> GamepadMoveAction;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DungeonsPlayer|Enhanced Input|Input Actions|Movement")
+		TObjectPtr<UInputAction> JumpAction;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DungeonsPlayer|Enhanced Input|Input Actions|Looking")
 		TObjectPtr<UInputAction> MouseLookAction;
 
@@ -107,9 +110,14 @@ protected:
 	void MoveRight(const FInputActionValue& Value);
 	void GamepadMove(const FInputActionValue& Value);
 
+	void Jump(); //I will eventually replace this with a Gameplay Ability.
+
 	void MouseLook(const FInputActionValue& Value);
 	void GamepadLook(const FInputActionValue& Value);
 	
-	void Attack();
-	
+	void Attack(); //I will eventually replace this with a Gameplay Ability.
+
+	void ResetCombo();
+
+	FTimerHandle ComboHandle;
 };

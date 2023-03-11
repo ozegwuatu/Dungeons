@@ -6,7 +6,8 @@
 void ADungeonsPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	CustomGameOnlyInputMode(false);
 }
 
 void ADungeonsPlayerController::CustomGameOnlyInputMode(bool bInConsumeCaptureMouseDown)

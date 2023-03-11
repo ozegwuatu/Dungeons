@@ -7,6 +7,7 @@
 #include "InputMappingContext.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 ADungeonsPlayer::ADungeonsPlayer(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -42,6 +43,8 @@ void ADungeonsPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		if (IsValid(MoveLeftAction)) PlayerEnhancedInputComponent->BindAction(MoveLeftAction, ETriggerEvent::Triggered, this, &ADungeonsPlayer::MoveLeft);
 		if (IsValid(MoveRightAction)) PlayerEnhancedInputComponent->BindAction(MoveRightAction, ETriggerEvent::Triggered, this, &ADungeonsPlayer::MoveRight);
 		if (IsValid(GamepadMoveAction)) PlayerEnhancedInputComponent->BindAction(GamepadMoveAction, ETriggerEvent::Triggered, this, &ADungeonsPlayer::GamepadMove);
+
+		if (IsValid(JumpAction)) PlayerEnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ADungeonsPlayer::Jump);
 		
 		if (IsValid(MouseLookAction)) PlayerEnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &ADungeonsPlayer::MouseLook);
 		if (IsValid(GamepadLookAction)) PlayerEnhancedInputComponent->BindAction(GamepadLookAction, ETriggerEvent::Triggered, this, &ADungeonsPlayer::GamepadLook);
@@ -71,31 +74,50 @@ void ADungeonsPlayer::PawnClientRestart()
 
 void ADungeonsPlayer::MoveForward(const FInputActionValue& Value)
 {
-	if (Value.GetMagnitude() != 0) AddMovementInput(GetActorForwardVector(), Value.Get<float>());
+	FRotator YRotation(0.f, GetControlRotation().Yaw, 0.f);
+
+	if (Value.GetMagnitude() != 0.f) AddMovementInput(UKismetMathLibrary::GetForwardVector(YRotation), Value[1]);
 }
 
 void ADungeonsPlayer::MoveBackward(const FInputActionValue& Value)
 {
-	if (Value.GetMagnitude() != 0) AddMovementInput(GetActorForwardVector(), -Value.Get<float>());
+	FRotator YRotation(0.f, GetControlRotation().Yaw, 0.f);
+
+	if (Value.GetMagnitude() != 0.f) AddMovementInput(UKismetMathLibrary::GetForwardVector(YRotation), Value[1]);
 }
 
 void ADungeonsPlayer::MoveLeft(const FInputActionValue& Value)
 {
-	if (Value.GetMagnitude() != 0) AddMovementInput(GetActorRightVector(), -Value.Get<float>());
+	FRotator XRotation(0.f, GetControlRotation().Yaw, GetControlRotation().Roll);
+
+	if (Value.GetMagnitude() != 0.f) AddMovementInput(UKismetMathLibrary::GetRightVector(XRotation), Value[0]);
 }
 
 void ADungeonsPlayer::MoveRight(const FInputActionValue& Value)
 {
-	if (Value.GetMagnitude() != 0) AddMovementInput(GetActorRightVector(), Value.Get<float>());
+	FRotator XRotation(0.f, GetControlRotation().Yaw, GetControlRotation().Roll);
+
+	if (Value.GetMagnitude() != 0.f) AddMovementInput(UKismetMathLibrary::GetRightVector(XRotation), Value[0]);
 }
 
 void ADungeonsPlayer::GamepadMove(const FInputActionValue& Value)
 {
-	if (Value.GetMagnitude() != 0)
+	FRotator YRotation(0.f, GetControlRotation().Yaw, 0.f);
+	FRotator XRotation(0.f, GetControlRotation().Yaw, GetControlRotation().Roll);
+
+	if (Value.GetMagnitude() != 0.f)
 	{
-		AddMovementInput(GetActorForwardVector(), Value[1]);
-		AddMovementInput(GetActorRightVector(), Value[0]);
+		AddMovementInput(UKismetMathLibrary::GetForwardVector(YRotation), Value[1]);
+		AddMovementInput(UKismetMathLibrary::GetRightVector(XRotation), Value[0]);
 	}
+}
+
+//I will eventually replace this with a Gameplay Ability.
+void ADungeonsPlayer::Jump()
+{
+	StopAnimMontage();
+	
+	ACharacter::Jump();
 }
 
 void ADungeonsPlayer::MouseLook(const FInputActionValue& Value)
@@ -116,8 +138,10 @@ void ADungeonsPlayer::GamepadLook(const FInputActionValue& Value)
 	}
 }
 
+//I will eventually replace this with a Gameplay Ability.
 void ADungeonsPlayer::Attack()
 {
+	//The player performs a different attack, depending on how far along their combo is.
 	switch(AttackCount)
 	{
 	case 0:
@@ -155,4 +179,14 @@ void ADungeonsPlayer::Attack()
 	default:
 		break;
 	}
+
+	//Reset the combo, if the player does not attack again within a certain amount of time.
+	GetWorldTimerManager().SetTimer(ComboHandle, this, &ADungeonsPlayer::ResetCombo, 1.f);
+}
+
+void ADungeonsPlayer::ResetCombo()
+{
+	AttackCount = 0;
+
+	GetWorldTimerManager().ClearTimer(ComboHandle);
 }
