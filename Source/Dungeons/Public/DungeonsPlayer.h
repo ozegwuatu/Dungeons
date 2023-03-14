@@ -63,17 +63,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DungeonsPlayer|Enhanced Input|Input Actions|Movement")
 		TObjectPtr<UInputAction> GamepadMoveAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DungeonsPlayer|Enhanced Input|Input Actions|Movement")
-		TObjectPtr<UInputAction> JumpAction;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DungeonsPlayer|Enhanced Input|Input Actions|Looking")
 		TObjectPtr<UInputAction> MouseLookAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DungeonsPlayer|Enhanced Input|Input Actions|Looking")
 		TObjectPtr<UInputAction> GamepadLookAction;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DungeonsPlayer|Enhanced Input|Input Actions|Attacks")
-		TObjectPtr<UInputAction> AttackAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DungeonsPlayer|Enhanced Input")
 		TObjectPtr<UInputMappingContext> CharacterContext;
@@ -101,8 +95,12 @@ protected:
 	float GamepadLookSensitivity = 50.f;
 
 	//The number of attacks that have been performed, during the player's current combo.
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, Category = "DungeonsPlayer|Abilities")
 		int32 AttackCount;
+
+	//Performs a melee attack. Can be done multiple times in succession.
+	UFUNCTION(BlueprintCallable, Category = "DungeonsPlayer|Abilities")
+		void Attack();
 
 	void MoveForward(const FInputActionValue& Value);
 	void MoveBackward(const FInputActionValue& Value);
@@ -110,14 +108,11 @@ protected:
 	void MoveRight(const FInputActionValue& Value);
 	void GamepadMove(const FInputActionValue& Value);
 
-	void Jump(); //I will eventually replace this with a Gameplay Ability.
-
 	void MouseLook(const FInputActionValue& Value);
 	void GamepadLook(const FInputActionValue& Value);
-	
-	void Attack(); //I will eventually replace this with a Gameplay Ability.
 
 	void ResetCombo();
 
 	FTimerHandle ComboHandle;
+	
 };

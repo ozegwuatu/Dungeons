@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "DungeonsPlayer.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -43,13 +42,9 @@ void ADungeonsPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		if (IsValid(MoveLeftAction)) PlayerEnhancedInputComponent->BindAction(MoveLeftAction, ETriggerEvent::Triggered, this, &ADungeonsPlayer::MoveLeft);
 		if (IsValid(MoveRightAction)) PlayerEnhancedInputComponent->BindAction(MoveRightAction, ETriggerEvent::Triggered, this, &ADungeonsPlayer::MoveRight);
 		if (IsValid(GamepadMoveAction)) PlayerEnhancedInputComponent->BindAction(GamepadMoveAction, ETriggerEvent::Triggered, this, &ADungeonsPlayer::GamepadMove);
-
-		if (IsValid(JumpAction)) PlayerEnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ADungeonsPlayer::Jump);
 		
 		if (IsValid(MouseLookAction)) PlayerEnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &ADungeonsPlayer::MouseLook);
 		if (IsValid(GamepadLookAction)) PlayerEnhancedInputComponent->BindAction(GamepadLookAction, ETriggerEvent::Triggered, this, &ADungeonsPlayer::GamepadLook);
-
-		if (IsValid(AttackAction)) PlayerEnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ADungeonsPlayer::Attack);
 	}
 }
 
@@ -112,14 +107,6 @@ void ADungeonsPlayer::GamepadMove(const FInputActionValue& Value)
 	}
 }
 
-//I will eventually replace this with a Gameplay Ability.
-void ADungeonsPlayer::Jump()
-{
-	StopAnimMontage();
-	
-	ACharacter::Jump();
-}
-
 void ADungeonsPlayer::MouseLook(const FInputActionValue& Value)
 {
 	if (Value.GetMagnitude() != 0)
@@ -138,7 +125,6 @@ void ADungeonsPlayer::GamepadLook(const FInputActionValue& Value)
 	}
 }
 
-//I will eventually replace this with a Gameplay Ability.
 void ADungeonsPlayer::Attack()
 {
 	//The player performs a different attack, depending on how far along their combo is.
